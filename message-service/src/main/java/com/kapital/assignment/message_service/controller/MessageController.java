@@ -21,7 +21,6 @@ public class MessageController {
     private MessageService messageService;
 
     @PostMapping
-    @PreAuthorize("hasRole('message_writer')")
     public ResponseEntity<SendMessageResponse> sendMessage(@Valid @RequestBody SendMessageRequest request,
                                                            Authentication authentication) throws Exception {
         // Extract user ID from authentication principal
@@ -43,7 +42,7 @@ public class MessageController {
      * @throws Exception if retrieval fails.
      */
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('message_reader')")
+  //  @PreAuthorize("hasRole('ROLE_message_reader')")
     public ResponseEntity<GetMessageResponse> getMessage(@PathVariable Long id, Authentication authentication) throws Exception {
         // Extract user ID from authentication principal
         Integer userId = getUserIdFromAuthentication(authentication);

@@ -4,17 +4,20 @@ import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
 import java.security.Key;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.stereotype.Component;
+
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+@Component
 public class JwtTokenProvider {
 
     @Value("${jwt.secret}")
     private String jwtSecret;
 
-    @Value("${jwt.expirationMs}")
+    @Value("${jwt.expiration.ms}")
     private long jwtExpirationMs;
 
     private Key getSigningKey() {

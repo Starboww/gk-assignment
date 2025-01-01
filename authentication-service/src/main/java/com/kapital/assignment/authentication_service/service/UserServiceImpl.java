@@ -73,19 +73,4 @@ public class UserServiceImpl implements UserService {
 
 
 
-//TODO : check if needed or not :
-
-//    @PostConstruct
-//    public void init() {
-//        if (userRepository.findByUsername("admin").isEmpty()) {
-//            User admin = new User();
-//            admin.setUsername("admin");
-//            admin.setPasswordHash(new org.springframework.security
-//                    .crypto.bcrypt.BCryptPasswordEncoder().encode("adminpass"));
-//            admin.getRoles().add("message_writer");
-//            admin.getRoles().add("message_reader");
-//            userRepository.save(admin);
-//        }
-//    }
-
 }
