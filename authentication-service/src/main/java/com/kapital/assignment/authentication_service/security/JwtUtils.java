@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
+@Slf4j
 @Component
 public class JwtUtils {
 
@@ -62,15 +62,15 @@ public class JwtUtils {
             Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
             return true;
         } catch (MalformedJwtException e) {
-           // log.error("Invalid JWT token", e);
+            log.error("Invalid JWT token", e);
         } catch (ExpiredJwtException e) {
-            //log.error("Expired JWT token", e);
+            log.error("Expired JWT token", e);
             // JWT token is expired
         } catch (UnsupportedJwtException e) {
-            //log.error("Unsupported JWT token", e);
+            log.error("Unsupported JWT token", e);
             // JWT token is unsupported
         } catch (IllegalArgumentException e) {
-           // log.error("JWT claims string is empty", e);
+            log.error("JWT claims string is empty", e);
             // JWT claims string is empty
         }
         return false;
