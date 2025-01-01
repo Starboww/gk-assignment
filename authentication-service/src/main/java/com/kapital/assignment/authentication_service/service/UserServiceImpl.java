@@ -1,20 +1,23 @@
 package com.kapital.assignment.authentication_service.service;
 
+
 import com.kapital.assignment.authentication_service.entity.User;
 import com.kapital.assignment.authentication_service.repo.UserRepository;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import jakarta.annotation.PostConstruct;
+import io.jsonwebtoken.security.Keys;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -29,20 +32,19 @@ public class UserServiceImpl implements UserService {
     @Value("${jwt.expiration.ms}")
     private long jwtExpirationMs;
 
-
+    private Key getSigningKey() {
+        return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+    }
     @Override
     public String generateToken(User user) {
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + jwtExpirationMs);
-
         String roles = String.join(",", user.getRoles());
 
         return Jwts.builder()
                 .setSubject(user.getUsername())
-                .claim("roles", String.join(",", roles)) // Add roles to JWT
+                .claim("roles", String.join(",", roles))
                 .setIssuedAt(new Date())
-                .setExpiration(expiryDate) // 24 hours
-                .signWith(SignatureAlgorithm.HS256, jwtSecret) // Replace with secure key
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
@@ -68,6 +70,8 @@ public class UserServiceImpl implements UserService {
     public Optional<User> findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
+
+
 
 //TODO : check if needed or not :
 

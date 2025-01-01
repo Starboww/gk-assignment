@@ -1,6 +1,7 @@
 package com.kapital.assignment.authentication_service.security;
 
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -8,6 +9,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
 import java.util.*;
 import java.util.stream.Collectors;
 @Slf4j
@@ -20,6 +23,9 @@ public class JwtUtils {
     @Value("${jwt.expiration.ms}")
     private long jwtExpirationMs;
 
+    private Key getSigningKey() {
+        return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+    }
     public String generateJwtToken(Authentication authentication) {
         org.springframework.security.core.userdetails.User userPrincipal =
                 (org.springframework.security.core.userdetails.User) authentication.getPrincipal();
@@ -32,25 +38,29 @@ public class JwtUtils {
 
         return Jwts.builder()
                 .setSubject(userPrincipal.getUsername())
-                .addClaims(claims)
+                .claim("roles", String.join(",", roles))
                 .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
-                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256) // Correct usage
                 .compact();
+
     }
     public String getUsernameFromJwt(String token) {
-        return Jwts.parser()
-                .setSigningKey(jwtSecret)
+         return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
     }
     public List<SimpleGrantedAuthority> getRolesFromJwt(String token) {
-        String roles = (String) Jwts.parser()
-                .setSigningKey(jwtSecret)
+        String roles = Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
                 .parseClaimsJws(token)
                 .getBody()
-                .get("roles");
+                .get("roles", String.class);
+//        return List.of(roles.split(","));
 
         return Arrays.stream(roles.split(","))
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
@@ -59,21 +69,17 @@ public class JwtUtils {
 
     public boolean validateJwtToken(String authToken) {
         try {
-            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
+            Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(authToken);
             return true;
-        } catch (MalformedJwtException e) {
-            log.error("Invalid JWT token", e);
-        } catch (ExpiredJwtException e) {
-            log.error("Expired JWT token", e);
-            // JWT token is expired
-        } catch (UnsupportedJwtException e) {
-            log.error("Unsupported JWT token", e);
-            // JWT token is unsupported
-        } catch (IllegalArgumentException e) {
-            log.error("JWT claims string is empty", e);
-            // JWT claims string is empty
+        } catch (SecurityException | MalformedJwtException | UnsupportedJwtException |
+                 IllegalArgumentException | ExpiredJwtException e) {
+            log.error(e.getMessage());
+            return false;
         }
-        return false;
+
     }
 
 }
