@@ -8,6 +8,7 @@ import java.util.Optional;
 public interface UserService extends UserDetailsService {
 
     String generateToken(User user);
+
     Optional<User> findByUsername(String username);
 
     User saveUser(User user);

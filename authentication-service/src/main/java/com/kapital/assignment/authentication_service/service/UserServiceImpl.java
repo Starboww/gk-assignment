@@ -7,12 +7,14 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -37,10 +39,10 @@ public class UserServiceImpl implements UserService {
 
         return Jwts.builder()
                 .setSubject(user.getUsername())
-                .claim("roles", roles)
-                .setIssuedAt(now)
-                .setExpiration(expiryDate)
-                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+                .claim("roles", String.join(",", roles)) // Add roles to JWT
+                .setIssuedAt(new Date())
+                .setExpiration(expiryDate) // 24 hours
+                .signWith(SignatureAlgorithm.HS256, jwtSecret) // Replace with secure key
                 .compact();
     }
 
