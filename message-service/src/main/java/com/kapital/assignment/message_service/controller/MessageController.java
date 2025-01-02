@@ -1,7 +1,6 @@
 package com.kapital.assignment.message_service.controller;
 
 import com.kapital.assignment.message_service.config.CustomUserDetails;
-import com.kapital.assignment.message_service.config.JwtAuthenticationFilter;
 import com.kapital.assignment.message_service.dto.GetMessageResponse;
 import com.kapital.assignment.message_service.dto.SendMessageRequest;
 import com.kapital.assignment.message_service.dto.SendMessageResponse;

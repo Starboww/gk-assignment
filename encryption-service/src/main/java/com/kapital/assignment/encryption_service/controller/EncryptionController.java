@@ -24,7 +24,7 @@ public class EncryptionController {
     private EncryptionService encryptionService;
 
     @PostMapping
-   // @PreAuthorize("hasRole('message_writer')")
+    // @PreAuthorize("hasRole('message_writer')")
     public ResponseEntity<EncryptionResponse> encryptMessage(
             @Valid @RequestBody EncryptionRequest request,
             Authentication authentication) throws Exception {
@@ -60,7 +60,6 @@ public class EncryptionController {
     }
 
     // DTO Classes
-
 
 
 }

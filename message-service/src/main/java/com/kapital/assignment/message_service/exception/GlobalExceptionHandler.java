@@ -75,7 +75,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         body.put("error", "Internal Server Error");
         body.put("message", "An unexpected error occurred");
 
-       logger.error(ex.getMessage(), ex);
+        logger.error(ex.getMessage(), ex);
         return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

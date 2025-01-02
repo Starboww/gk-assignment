@@ -4,21 +4,12 @@ package com.kapital.assignment.authentication_service.service;
 import com.kapital.assignment.authentication_service.entity.User;
 import com.kapital.assignment.authentication_service.repo.UserRepository;
 import com.kapital.assignment.authentication_service.security.JwtUtils;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.nio.charset.StandardCharsets;
-import java.security.Key;
-import java.util.Date;
 import java.util.Optional;
 import java.util.stream.Collectors;
 

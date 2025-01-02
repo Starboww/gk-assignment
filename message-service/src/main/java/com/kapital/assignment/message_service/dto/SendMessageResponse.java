@@ -16,5 +16,4 @@ public class SendMessageResponse {
     private String error;
 
 
-
 }

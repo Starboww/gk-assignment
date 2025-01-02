@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
-
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
