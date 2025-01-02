@@ -8,5 +8,5 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class EncryptionResponse {
-    private String encrypted;
+    private String encryptedMessage;
 }

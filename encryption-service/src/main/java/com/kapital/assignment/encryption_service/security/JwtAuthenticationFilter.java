@@ -1,9 +1,11 @@
 package com.kapital.assignment.encryption_service.security;
 
+import com.kapital.assignment.encryption_service.config.CustomUserDetails;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -18,13 +20,12 @@ import java.util.stream.Collectors;
 
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
+
     private final JwtTokenProvider tokenProvider;
+
 
     public JwtAuthenticationFilter(JwtTokenProvider tokenProvider) {
         this.tokenProvider = tokenProvider;
@@ -39,20 +40,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String jwt = getJwtFromRequest(request);
             if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
                 String username = tokenProvider.getUsernameFromJWT(jwt);
+                Long userId = tokenProvider.getUserIdFromJWT(jwt);
                 List<SimpleGrantedAuthority> authorities = tokenProvider.getRolesFromJWT(jwt).stream()
                         .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
                         .collect(Collectors.toList());
-                logger.debug("Parsed Username: {}", username);
-                logger.debug("Parsed Roles: {}", authorities);
+//                logger.info("Parsed Username: {}", username);
+//                logger.debug("Parsed Roles: {}", authorities);
+//                logger.debug("Parsed UserId: {}", userId);
+
+                // Create CustomUserDetails with userId
+                CustomUserDetails userDetails = new CustomUserDetails(username, userId, authorities);
+
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        username, null, authorities);
+                        userDetails, null, authorities);
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 // Set the authentication in the context
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                // Check role-based access for the requested endpoint
-              //  checkAccess(request, authorities);
+                // Optionally, perform additional checks or logging
             } else {
                 logger.debug("JWT token is missing or invalid");
             }
@@ -67,6 +73,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    /**
+     * Extracts the JWT token from the request header.
+     *
+     * @param request The HTTP request.
+     * @return The JWT token or null if not present.
+     */
     private String getJwtFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
@@ -75,17 +87,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return null;
     }
 
-    private void checkAccess(HttpServletRequest request, List<SimpleGrantedAuthority> authorities) {
-        String requestURI = request.getRequestURI();
-
-        if (requestURI.startsWith("/api/encrypt") && request.getMethod().equals("POST")) {
-            if (!authorities.contains(new SimpleGrantedAuthority("ROLE_message_writer"))) {
-                throw new AccessDeniedException("User does not have the required role: message_writer");
-            }
-        } else if (requestURI.startsWith("/api/encrypt/decrypt") && request.getMethod().equals("POST")) {
-            if (!authorities.contains(new SimpleGrantedAuthority("ROLE_message_reader"))) {
-                throw new AccessDeniedException("User does not have the required role: message_reader");
-            }
-        }
-    }
+    // Remove or refactor the checkAccess method if not needed
 }

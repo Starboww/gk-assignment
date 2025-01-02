@@ -13,6 +13,7 @@ public class SendMessageResponse {
     private String status;
     private String encryptedMessage;
     private Long messageId;
+    private String error;
 
 
 

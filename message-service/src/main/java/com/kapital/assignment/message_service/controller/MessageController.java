@@ -1,5 +1,7 @@
 package com.kapital.assignment.message_service.controller;
 
+import com.kapital.assignment.message_service.config.CustomUserDetails;
+import com.kapital.assignment.message_service.config.JwtAuthenticationFilter;
 import com.kapital.assignment.message_service.dto.GetMessageResponse;
 import com.kapital.assignment.message_service.dto.SendMessageRequest;
 import com.kapital.assignment.message_service.dto.SendMessageResponse;
@@ -17,61 +19,52 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/message")
 public class MessageController {
 
+
     @Autowired
     private MessageService messageService;
 
     @PostMapping
-    public ResponseEntity<SendMessageResponse> sendMessage(@Valid @RequestBody SendMessageRequest request,
-                                                           Authentication authentication) throws Exception {
-        // Extract user ID from authentication principal
-        Integer userId = getUserIdFromAuthentication(authentication);
-
-        // Send the message
-        Message message = messageService.sendMessage(request.getMessage(), request.getEncryptionType(), userId);
-
-        // Prepare response
-        SendMessageResponse response = new SendMessageResponse("Success", message.getEncryptedMessage(), message.getId());
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-    /**
-     * Endpoint to retrieve a message by ID.
-     *
-     * @param id The ID of the message.
-     * @param authentication The authentication object containing user details.
-     * @return ResponseEntity with the encrypted message.
-     * @throws Exception if retrieval fails.
-     */
-    @GetMapping("/{id}")
-  //  @PreAuthorize("hasRole('ROLE_message_reader')")
-    public ResponseEntity<GetMessageResponse> getMessage(@PathVariable Long id, Authentication authentication) throws Exception {
-        // Extract user ID from authentication principal
-        Integer userId = getUserIdFromAuthentication(authentication);
-
-        // Retrieve the message
-        Message message = messageService.getMessage(id, userId);
-
-        // Prepare response
-        GetMessageResponse response = new GetMessageResponse(message.getId(), message.getEncryptedMessage());
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-
-    /**
-     * Helper method to extract user ID from Authentication object.
-     * Assumes that the username corresponds to the user ID in the Authentication Service.
-     *
-     * @param authentication The authentication object.
-     * @return The user ID as Integer.
-     * @throws Exception if user ID extraction fails.
-     */
-    private Integer getUserIdFromAuthentication(Authentication authentication) throws Exception {
-        // Assuming that the username is the user ID as a string
-        // Adjust this logic based on your Authentication Service's implementation
-        String username = authentication.getName();
+    @PreAuthorize("hasRole('message_writer')")
+    public ResponseEntity<SendMessageResponse> sendMessage(
+            @Valid @RequestBody SendMessageRequest request,
+            Authentication authentication) {
         try {
-            return Integer.parseInt(username);
-        } catch (NumberFormatException e) {
-            throw new Exception("Invalid user ID in token");
+            // Extract userId from CustomUserDetails
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            Long userId = userDetails.getUserId();
+
+            Message message = messageService.sendMessage(request.getMessage(), request.getEncryptionType(), userId);
+            return ResponseEntity.ok(SendMessageResponse.builder()
+                    .status("SUCCESS")
+                    .encryptedMessage(message.getEncryptedMessage())
+                    .messageId(message.getId()).build());
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(SendMessageResponse.builder()
+                    .status("FAILURE")
+                    .error(e.getMessage())
+                    .build());
+        }
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('message_reader')")
+    public ResponseEntity<GetMessageResponse> getMessage(
+            @PathVariable("id") Long id,
+            Authentication authentication) {
+        try {
+            // Extract userId from CustomUserDetails
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            Long userId = userDetails.getUserId();
+
+            return messageService.getMessage(id, userId)
+                    .map(message -> ResponseEntity
+                            .ok(new GetMessageResponse(message.getId(), message.getEncryptedMessage(), "")))
+                    .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
+                            .body(new GetMessageResponse(null, null, "Message not found")));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new GetMessageResponse(null, null, e.getMessage()));
         }
     }
 

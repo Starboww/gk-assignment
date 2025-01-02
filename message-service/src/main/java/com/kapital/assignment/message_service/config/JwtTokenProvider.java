@@ -1,6 +1,8 @@
 package com.kapital.assignment.message_service.config;
 
 import io.jsonwebtoken.*;
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import java.security.Key;
 import io.jsonwebtoken.security.Keys;
@@ -8,59 +10,82 @@ import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.Date;
+
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class JwtTokenProvider {
-
     @Value("${jwt.secret}")
     private String jwtSecret;
 
     @Value("${jwt.expiration.ms}")
     private long jwtExpirationMs;
 
-    private Key getSigningKey() {
-        return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+    private Key signingKey;
+
+    @PostConstruct
+    public void init() {
+        this.signingKey = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
     }
 
-    // Generate token (optional, if needed)
-    public String generateToken(String username, List<String> roles) {
-        return Jwts.builder()
-                .setSubject(username)
-                .claim("roles", String.join(",", roles))
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
-                .compact();
-    }
-
-    // Get username from token
+    /**
+     * Extracts the username from the JWT token.
+     *
+     * @param token The JWT token.
+     * @return The username.
+     */
     public String getUsernameFromJWT(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
+                .setSigningKey(signingKey)
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
     }
 
-    // Get roles from token
+    /**
+     * Extracts the roles from the JWT token.
+     *
+     * @param token The JWT token.
+     * @return A list of roles.
+     */
     public List<String> getRolesFromJWT(String token) {
         String roles = Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
+                .setSigningKey(signingKey)
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
                 .get("roles", String.class);
+
         return Arrays.asList(roles.split(","));
     }
 
-    // Validate token
-    public boolean validateToken(String authToken) {
+    /**
+     * Extracts the userId from the JWT token.
+     *
+     * @param token The JWT token.
+     * @return The userId.
+     */
+    public Long getUserIdFromJWT(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(signingKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("userId", Long.class);
+    }
+
+    /**
+     * Validates the JWT token.
+     *
+     * @param authToken The JWT token.
+     * @return True if valid, else false.
+     */
+    public boolean validateJwtToken(String authToken) {
         try {
             Jwts.parserBuilder()
-                    .setSigningKey(getSigningKey())
+                    .setSigningKey(signingKey)
                     .build()
                     .parseClaimsJws(authToken);
             return true;
@@ -70,6 +95,4 @@ public class JwtTokenProvider {
             return false;
         }
     }
-
-
 }

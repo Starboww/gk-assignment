@@ -7,9 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class GetMessageResponse {
-    private Long messageId;
-    private String encryptedMessage;
-    private String error;
-}
+public class DecryptionResponse {
 
+    private String decryptedMessage;
+
+}

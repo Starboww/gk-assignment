@@ -27,7 +27,7 @@ public class Message {
     private String encryptionType;
 
     @Column(name="user_id", nullable = false)
-    private Integer userId;
+    private Long userId;
 
     @Column(name="created_at", nullable = false, updatable = false)
     private ZonedDateTime createdAt;

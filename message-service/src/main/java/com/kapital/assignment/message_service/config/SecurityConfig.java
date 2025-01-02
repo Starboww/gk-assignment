@@ -25,8 +25,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
 
                 // No session management; make it stateless
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 // Authorize requests
                 .authorizeHttpRequests(auth -> auth
@@ -39,14 +38,15 @@ public class SecurityConfig {
 
                 // Handle unauthorized attempts
                 .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint((request, response,
-                                                   authException) -> {
+                        .authenticationEntryPoint((request, response, authException) -> {
                             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
                         })
                 );
 
         return http.build();
     }
+
+
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {

@@ -3,6 +3,8 @@ package com.kapital.assignment.authentication_service.controller;
 import com.kapital.assignment.authentication_service.dto.AuthRequest;
 import com.kapital.assignment.authentication_service.dto.AuthResponse;
 import com.kapital.assignment.authentication_service.entity.User;
+import com.kapital.assignment.authentication_service.repo.UserRepository;
+import com.kapital.assignment.authentication_service.security.JwtUtils;
 import com.kapital.assignment.authentication_service.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,12 +21,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
+
     @Autowired
     private AuthenticationManager authenticationManager;
 
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private JwtUtils jwtUtils;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @PostMapping("/token")
     public ResponseEntity<?> authenticateUser(@RequestBody AuthRequest authRequest) {
@@ -35,11 +43,13 @@ public class AuthController {
                             authRequest.getPassword()
                     )
             );
+            org.springframework.security.core.userdetails.User userPrincipal =
+                    (org.springframework.security.core.userdetails.User) authentication.getPrincipal();
 
             User user = userService.findByUsername(authRequest.getUsername())
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
-            String token = userService.generateToken(user);
+            String token = jwtUtils.generateToken(user);
 
             return ResponseEntity.ok(new AuthResponse(token));
         } catch (BadCredentialsException e) {

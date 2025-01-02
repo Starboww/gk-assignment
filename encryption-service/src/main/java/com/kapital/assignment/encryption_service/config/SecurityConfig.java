@@ -20,6 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
     @EnableMethodSecurity // Enables method-level security (e.g., @PreAuthorize)
     public class SecurityConfig {
 
+
         @Autowired
         private JwtTokenProvider jwtTokenProvider;
 
