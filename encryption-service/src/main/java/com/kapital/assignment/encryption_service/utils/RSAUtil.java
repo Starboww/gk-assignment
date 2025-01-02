@@ -24,6 +24,13 @@ public class RSAUtil {
         this.privateKey = keyFactory.generatePrivate(new PKCS8EncodedKeySpec(privateKeyBytes));
     }
 
+    // Utility to generate RSA key pair and get Base64-encoded strings
+    public static KeyPair generateKeyPair() throws Exception {
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(RSA);
+        keyPairGenerator.initialize(2048);
+        return keyPairGenerator.generateKeyPair();
+    }
+
     public String encrypt(String plainText) throws Exception {
         Cipher cipher = Cipher.getInstance(RSA_TRANSFORMATION);
         cipher.init(Cipher.ENCRYPT_MODE, publicKey);
@@ -36,13 +43,6 @@ public class RSAUtil {
         cipher.init(Cipher.DECRYPT_MODE, privateKey);
         byte[] plainText = cipher.doFinal(Base64.getDecoder().decode(encryptedText));
         return new String(plainText);
-    }
-
-    // Utility to generate RSA key pair and get Base64-encoded strings
-    public static KeyPair generateKeyPair() throws Exception {
-        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(RSA);
-        keyPairGenerator.initialize(2048);
-        return keyPairGenerator.generateKeyPair();
     }
 
 }

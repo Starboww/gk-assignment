@@ -1,7 +1,6 @@
 package com.kapital.assignment.message_service.controller;
 
 import com.kapital.assignment.message_service.config.CustomUserDetails;
-import com.kapital.assignment.message_service.config.JwtAuthenticationFilter;
 import com.kapital.assignment.message_service.dto.GetMessageResponse;
 import com.kapital.assignment.message_service.dto.SendMessageRequest;
 import com.kapital.assignment.message_service.dto.SendMessageResponse;
@@ -24,7 +23,7 @@ public class MessageController {
     private MessageService messageService;
 
     @PostMapping
-    @PreAuthorize("hasRole('message_writer')")
+    @PreAuthorize("hasRole('MESSAGE_WRITER')")
     public ResponseEntity<SendMessageResponse> sendMessage(
             @Valid @RequestBody SendMessageRequest request,
             Authentication authentication) {
@@ -48,7 +47,7 @@ public class MessageController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('message_reader')")
+    @PreAuthorize("hasRole('MESSAGE_READER')")
     public ResponseEntity<GetMessageResponse> getMessage(
             @PathVariable("id") Long id,
             Authentication authentication) {

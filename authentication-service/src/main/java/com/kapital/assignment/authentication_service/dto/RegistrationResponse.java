@@ -1,4 +1,4 @@
-package com.kapital.assignment.message_service.dto;
+package com.kapital.assignment.authentication_service.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,7 @@ import lombok.Setter;
 @Setter
 @Builder
 @AllArgsConstructor
-public class EncryptionRequest {
+public class RegistrationResponse {
+    private String token;
     private String message;
-    private String encryptionType;
-
 }

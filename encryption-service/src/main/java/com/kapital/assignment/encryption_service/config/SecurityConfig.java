@@ -15,46 +15,46 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-    @Configuration
-    @EnableWebSecurity
-    @EnableMethodSecurity // Enables method-level security (e.g., @PreAuthorize)
-    public class SecurityConfig {
+@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity // Enables method-level security (e.g., @PreAuthorize)
+public class SecurityConfig {
 
 
-        @Autowired
-        private JwtTokenProvider jwtTokenProvider;
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
 
-        @Bean
-        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-            http
-                    // Disable CSRF as we're using JWTs
-                    .csrf(csrf -> csrf.disable())
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                // Disable CSRF as we're using JWTs
+                .csrf(csrf -> csrf.disable())
 
-                    // No session management; make it stateless
-                    .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                // No session management; make it stateless
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                    // Authorize requests
-                    .authorizeHttpRequests(auth -> auth
-                            .requestMatchers("/api/encrypt/**").authenticated()
-                            .anyRequest().permitAll()
-                    )
+                // Authorize requests
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/encrypt/**").authenticated()
+                        .anyRequest().permitAll()
+                )
 
-                    // Add JWT Filter
-                    .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
+                // Add JWT Filter
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
 
-                    // Handle unauthorized attempts
-                    .exceptionHandling(exception -> exception
-                            .authenticationEntryPoint((request, response, authException) -> {
-                                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
-                            })
-                    );
+                // Handle unauthorized attempts
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
+                        })
+                );
 
-            return http.build();
-        }
+        return http.build();
+    }
 
-        @Bean
-        public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
-            return authConfig.getAuthenticationManager();
-        }
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
+    }
 }
 

@@ -4,21 +4,13 @@ package com.kapital.assignment.authentication_service.service;
 import com.kapital.assignment.authentication_service.entity.User;
 import com.kapital.assignment.authentication_service.repo.UserRepository;
 import com.kapital.assignment.authentication_service.security.JwtUtils;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.nio.charset.StandardCharsets;
-import java.security.Key;
-import java.util.Date;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -78,6 +70,22 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private JwtUtils jwtUtils;
+
+
+    // Initialize BCryptPasswordEncoder
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+    @Override
+    public String hashPassword(String rawPassword) {
+        return passwordEncoder.encode(rawPassword);
+    }
+
+    @Override
+    public boolean existsByUsername(String username) {
+       Optional<User> user = userRepository.findByUsername(username);
+       return user.isPresent();
+    }
+
 
     @Override
     public String generateToken(User user) {

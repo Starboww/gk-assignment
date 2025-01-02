@@ -23,6 +23,14 @@ public class AESUtil {
         this.secretKey = new javax.crypto.spec.SecretKeySpec(decodedKey, AES);
     }
 
+    // Utility to generate a Base64-encoded AES key
+    public static String generateKey() throws Exception {
+        KeyGenerator keyGenerator = KeyGenerator.getInstance(AES);
+        keyGenerator.init(256); // 256-bit AES
+        SecretKey key = keyGenerator.generateKey();
+        return Base64.getEncoder().encodeToString(key.getEncoded());
+    }
+
     public String encrypt(String plainText) throws Exception {
         byte[] iv = new byte[GCM_IV_LENGTH];
         secureRandom.nextBytes(iv);
@@ -57,13 +65,5 @@ public class AESUtil {
         byte[] plainText = cipher.doFinal(cipherText);
 
         return new String(plainText, StandardCharsets.UTF_8);
-    }
-
-    // Utility to generate a Base64-encoded AES key
-    public static String generateKey() throws Exception {
-        KeyGenerator keyGenerator = KeyGenerator.getInstance(AES);
-        keyGenerator.init(256); // 256-bit AES
-        SecretKey key = keyGenerator.generateKey();
-        return Base64.getEncoder().encodeToString(key.getEncoded());
     }
 }

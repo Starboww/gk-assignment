@@ -13,4 +13,8 @@ public interface UserService extends UserDetailsService {
 
     User saveUser(User user);
 
+   String hashPassword(String rawPassword);
+
+    boolean existsByUsername(String username);
+
 }

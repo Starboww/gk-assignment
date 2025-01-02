@@ -2,7 +2,6 @@ package com.kapital.assignment.message_service.service;
 
 import com.kapital.assignment.message_service.client.EncryptionClient;
 import com.kapital.assignment.message_service.config.CustomUserDetails;
-import com.kapital.assignment.message_service.config.JwtTokenProvider;
 import com.kapital.assignment.message_service.dto.EncryptionRequest;
 import com.kapital.assignment.message_service.dto.EncryptionResponse;
 import com.kapital.assignment.message_service.model.Message;
@@ -11,7 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.Optional;
+
 @Service
 public class MessageService {
     @Autowired
@@ -20,8 +22,6 @@ public class MessageService {
     @Autowired
     private EncryptionClient encryptionServiceClient;
 
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider; // Implement this to obtain tokens if needed
 
     public Message sendMessage(String messageContent, String encryptionType, Long userId) throws Exception {
         // Call Encryption Service to encrypt the message
@@ -31,12 +31,13 @@ public class MessageService {
         if (encryptionResponse == null || encryptionResponse.getEncryptedMessage() == null) {
             throw new Exception("Failed to encrypt the message");
         }
-
         // Save the encrypted message
         Message message = Message.builder()
                 .encryptedMessage(encryptionResponse.getEncryptedMessage())
+                .originalMessage(messageContent)
                 .encryptionType(encryptionType.toUpperCase())
                 .userId(userId)
+                .createdAt(ZonedDateTime.from(Instant.now()))
                 .build();
 
         return messageRepository.save(message);
@@ -49,6 +50,7 @@ public class MessageService {
         }
         return Optional.empty();
     }
+
     private Long getUserIdFromAuthentication(Authentication authentication) throws Exception {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         return userDetails.getUserId();

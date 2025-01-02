@@ -3,6 +3,7 @@
 CREATE TABLE messages
 (
     id                SERIAL PRIMARY KEY,
+    original_message  TEXT        NOT NULL,
     encrypted_message TEXT        NOT NULL,
     encryption_type   VARCHAR(10) NOT NULL,
     user_id           INT         NOT NULL,
