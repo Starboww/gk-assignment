@@ -20,6 +20,9 @@ public class Message {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "original_message", nullable = false, columnDefinition = "TEXT")
+    private String originalMessage;
+
     @Column(name = "encrypted_message", nullable = false, columnDefinition = "TEXT")
     private String encryptedMessage;
 

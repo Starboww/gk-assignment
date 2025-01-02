@@ -23,7 +23,7 @@ public class MessageController {
     private MessageService messageService;
 
     @PostMapping
-    @PreAuthorize("hasRole('message_writer')")
+    @PreAuthorize("hasRole('MESSAGE_WRITER')")
     public ResponseEntity<SendMessageResponse> sendMessage(
             @Valid @RequestBody SendMessageRequest request,
             Authentication authentication) {
@@ -47,7 +47,7 @@ public class MessageController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('message_reader')")
+    @PreAuthorize("hasRole('MESSAGE_READER')")
     public ResponseEntity<GetMessageResponse> getMessage(
             @PathVariable("id") Long id,
             Authentication authentication) {
