@@ -13,14 +13,11 @@ public class EncryptionServiceFeignClientConfig {
 
     @Bean
     public RequestInterceptor requestInterceptor() {
-        return new RequestInterceptor() {
-            @Override
-            public void apply(RequestTemplate template) {
-                Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-                if (authentication != null && StringUtils.hasText(authentication.getCredentials().toString())) {
-                    String token = authentication.getCredentials().toString();
-                    template.header("Authorization", "Bearer " + token);
-                }
+        return template -> {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && StringUtils.hasText(authentication.getCredentials().toString())) {
+                String token = authentication.getCredentials().toString();
+                template.header("Authorization", "Bearer " + token);
             }
         };
     }
