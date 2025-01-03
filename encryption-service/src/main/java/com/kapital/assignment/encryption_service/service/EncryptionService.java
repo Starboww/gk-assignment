@@ -1,5 +1,7 @@
 package com.kapital.assignment.encryption_service.service;
 
+import com.kapital.assignment.encryption_service.exception.DecryptionException;
+import com.kapital.assignment.encryption_service.exception.InvalidEncryptionTypeException;
 import com.kapital.assignment.encryption_service.utils.AESUtil;
 import com.kapital.assignment.encryption_service.utils.RSAUtil;
 import jakarta.annotation.PostConstruct;
@@ -23,10 +25,9 @@ public class EncryptionService {
 
     @PostConstruct
     public void init() throws Exception {
-        // Initialize AES Utility
+
         aesUtil = new AESUtil(aesKeyBase64);
 
-        // Initialize RSA Utility
         rsaUtil = new RSAUtil(rsaPublicKeyBase64, rsaPrivateKeyBase64);
     }
 
@@ -41,12 +42,16 @@ public class EncryptionService {
     }
 
     public String decrypt(String encryptedMessage, String encryptionType) throws Exception {
-        if ("AES".equalsIgnoreCase(encryptionType)) {
-            return aesUtil.decrypt(encryptedMessage);
-        } else if ("RSA".equalsIgnoreCase(encryptionType)) {
-            return rsaUtil.decrypt(encryptedMessage);
-        } else {
-            throw new IllegalArgumentException("Unsupported decryption type: " + encryptionType);
+        try {
+            if ("AES".equalsIgnoreCase(encryptionType)) {
+                return aesUtil.decrypt(encryptedMessage);
+            } else if ("RSA".equalsIgnoreCase(encryptionType)) {
+                return rsaUtil.decrypt(encryptedMessage);
+            } else {
+                throw new InvalidEncryptionTypeException("Unsupported decryption type: " + encryptionType);
+            }
+        } catch (Exception e) {
+            throw new DecryptionException("Failed to decrypt the message", e);
         }
     }
 

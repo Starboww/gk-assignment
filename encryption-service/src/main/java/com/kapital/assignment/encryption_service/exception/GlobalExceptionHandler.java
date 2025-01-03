@@ -76,6 +76,21 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+    @ExceptionHandler(InvalidEncryptionTypeException.class)
+    public ResponseEntity<String> handleInvalidEncryptionType(InvalidEncryptionTypeException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ex.getMessage());
+    }
+
+    @ExceptionHandler(DecryptionException.class)
+    public ResponseEntity<String> handleDecryptionException(DecryptionException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body("Unable to decrypt the message");
+    }
+
+
 
 
 }
