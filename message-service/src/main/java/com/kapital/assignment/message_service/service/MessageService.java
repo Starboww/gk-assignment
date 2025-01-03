@@ -33,14 +33,14 @@ public class MessageService {
      * @throws Exception if encryption fails or the encrypted message is null
      */
     public Message sendMessage(String messageContent, String encryptionType, Long userId) throws Exception {
-        // Call Encryption Service to encrypt the message
+        // Calling Encryption Service to encrypt the message
         EncryptionRequest encryptionRequest = new EncryptionRequest(messageContent, encryptionType);
         EncryptionResponse encryptionResponse = encryptionServiceClient.encryptMessage(encryptionRequest);
 
         if (encryptionResponse == null || encryptionResponse.getEncryptedMessage() == null) {
             throw new Exception("Failed to encrypt the message");
         }
-        // Save the encrypted message
+        // Saving the encrypted message
         Message message = Message.builder()
                 .encryptedMessage(encryptionResponse.getEncryptedMessage())
                 .originalMessage(messageContent)
