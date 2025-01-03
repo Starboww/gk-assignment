@@ -8,7 +8,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class DecryptionResponse {
-
     private String decryptedMessage;
 
 }
