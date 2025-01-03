@@ -502,9 +502,10 @@ Roles define the permissions a user has within the system:
     - **Authentication Service:** Relational Database (PostgreSQL)
     - **Message Service:** Relational Database (PostgreSQL)
 - **Environment Variables:**
-    - `JWT_SECRET`: Secret key for signing JWT tokens.
+    - `JWT_SECRET`,`JWT_EXPIRATION_MS`: Secret key for signing JWT tokens, Validity of token
     - `ENCRYPTION_SERVICE_URL`: URL of the Encryption Service.
     - `DATABASE_URL`, `DATABASE_USERNAME`, `DATABASE_PASSWORD`: Database connection details.
+    - `ENCRYPTION_AES_KEY`,`ENCRYPTION_RSA_PUBLIC_KEY`,`ENCRYPTION_RSA_PRIVATE_KEY` : Encryption keys
 
 ### 5.2. Running the Services
 
