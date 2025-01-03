@@ -171,14 +171,14 @@ The **Message Service** manages sending and retrieving encrypted messages. It in
 
 #### **Message Table**
 
-| Column Name      | Data Type | Constraints                         | Description                              |
-|------------------|-----------|-------------------------------------|------------------------------------------|
-| `id`             | BIGINT    | PRIMARY KEY, AUTO_INCREMENT         | Unique identifier for each message.      |
-| `originalMessage` | TEXT    | NOT NULL                            | unencrypted content of the message.    |
+| Column Name        | Data Type | Constraints                         | Description                              |
+|--------------------|-----------|-------------------------------------|------------------------------------------|
+| `id`               | BIGINT    | PRIMARY KEY, AUTO_INCREMENT         | Unique identifier for each message.      |
+| `originalMessage`  | TEXT    | NOT NULL                            | unencrypted content of the message.    |
 | `encryptedMessage` | TEXT    | NOT NULL                            | The encrypted content of the message.    |
-| `encryptionType` | VARCHAR(10) | NOT NULL                          | Type of encryption used (`AES` or `RSA`). |
-| `userId`         | BIGINT    | NOT NULL, FOREIGN KEY REFERENCES User(id) | Identifier of the user who sent the message. |
-| `timestamp`      | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP           | Time when the message was sent.          |
+| `encryptionType`   | VARCHAR(10) | NOT NULL                          | Type of encryption used (`AES` or `RSA`). |
+| `userId`           | BIGINT    | NOT NULL, FOREIGN KEY REFERENCES User(id) | Identifier of the user who sent the message. |
+| `createdAt`        | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP           | Time when the message was sent.          |
 
 **Notes:**
 - **Foreign Key:** `userId` links to the `User` table in the Authentication Service.
@@ -312,14 +312,10 @@ The **Message Service** manages sending and retrieving encrypted messages. It in
 
 The **Encryption Service** is responsible for encrypting and decrypting messages. It ensures that message content is securely transformed based on the specified encryption type.
 
-### 3.1. Database Structure
 
-**Note:** The Encryption Service, as currently designed, does not persist any data. It processes requests and returns encrypted or decrypted messages on-the-fly.
+### 3.1. API Endpoints
 
-
-### 3.2. API Endpoints
-
-#### **3.2.1. Encrypt Message**
+#### **3.1.1. Encrypt Message**
 
 - **Endpoint:** `/api/encrypt`
 - **Method:** `POST`
@@ -375,7 +371,7 @@ The **Encryption Service** is responsible for encrypting and decrypting messages
   }
   ```
 
-#### **3.2.2. Decrypt Message**
+#### **3.1.2. Decrypt Message**
 
 - **Endpoint:** `/api/encrypt/decrypt`
 - **Method:** `POST`
@@ -461,7 +457,7 @@ JWT (JSON Web Token) is used for securing API endpoints across all services. Eac
 ```json
 {
   "sub": "john_doe",
-  "roles": "ROLE_message_writer,ROLE_message_reader",
+  "roles": "MESSAGE_WRITER,MESSAGE_READER",
   "userId": 1,
   "iat": 1705720645,
   "exp": 1705807045
@@ -472,8 +468,8 @@ JWT (JSON Web Token) is used for securing API endpoints across all services. Eac
 
 Roles define the permissions a user has within the system:
 
-- **`ROLE_message_writer`:** Allows the user to send (write) messages.
-- **`ROLE_message_reader`:** Allows the user to retrieve (read) messages.
+- **`MESSAGE_WRITER`:** Allows the user to send (write) messages.
+- **`MESSAGE_READER`:** Allows the user to retrieve (read) messages.
 
 **Role Assignment Rules:**
 
@@ -485,13 +481,13 @@ Roles define the permissions a user has within the system:
 - **Send Message Endpoint:**
 
   ```java
-  @PreAuthorize("hasRole('message_writer')")
+  @PreAuthorize("hasRole('MESSAGE_WRITER')")
   ```
 
 - **Retrieve Message Endpoint:**
 
   ```java
-  @PreAuthorize("hasRole('message_reader')")
+  @PreAuthorize("hasRole('MESSAGE_READER')")
   ```
 
 ---
@@ -501,10 +497,10 @@ Roles define the permissions a user has within the system:
 ### 5.1. Prerequisites
 
 - **Java Development Kit (JDK) 17 or higher**
-- **Maven or Gradle Build Tool**
+- **Maven Build Tool**
 - **Databases:**
-    - **Authentication Service:** Relational Database (e.g., MySQL, PostgreSQL)
-    - **Message Service:** Relational Database (e.g., MySQL, PostgreSQL)
+    - **Authentication Service:** Relational Database (PostgreSQL)
+    - **Message Service:** Relational Database (PostgreSQL)
 - **Environment Variables:**
     - `JWT_SECRET`: Secret key for signing JWT tokens.
     - `ENCRYPTION_SERVICE_URL`: URL of the Encryption Service.
@@ -530,7 +526,7 @@ cd encryption-service
 mvn spring-boot:run
 ```
 
-**Note:** Replace `mvn` with `./mvnw` or `./gradlew` if using Maven Wrapper or Gradle.
+**Note:** Replace `mvn` with `./mvnw`  if using Maven Wrapper .
 
 ### 5.3. Configuring Feign Clients
 
