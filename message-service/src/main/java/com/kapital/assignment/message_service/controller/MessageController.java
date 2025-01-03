@@ -28,16 +28,13 @@ public class MessageController {
             @Valid @RequestBody SendMessageRequest request,
             Authentication authentication) {
         try {
-            // Extract userId from CustomUserDetails
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             Long userId = userDetails.getUserId();
-
             Message message = messageService.sendMessage(request.getMessage(), request.getEncryptionType(), userId);
             return ResponseEntity.ok(SendMessageResponse.builder()
                     .status("SUCCESS")
                     .encryptedMessage(message.getEncryptedMessage())
                     .messageId(message.getId()).build());
-
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(SendMessageResponse.builder()
                     .status("FAILURE")
@@ -52,7 +49,6 @@ public class MessageController {
             @PathVariable("id") Long id,
             Authentication authentication) {
         try {
-            // Extract userId from CustomUserDetails
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             Long userId = userDetails.getUserId();
             return messageService.getMessage(id, userId)

@@ -50,10 +50,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         userDetails, null, authorities);
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                // Set the authentication in the context
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                // Optionally, perform additional checks or logging
             } else {
                 logger.debug("JWT token is missing or invalid");
             }

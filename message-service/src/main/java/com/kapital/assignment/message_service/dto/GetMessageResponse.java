@@ -7,7 +7,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @Builder
 public class GetMessageResponse {
     private Long messageId;

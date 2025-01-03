@@ -30,11 +30,9 @@ public class EncryptionController {
     public ResponseEntity<EncryptionResponse> encryptMessage(
             @Valid @RequestBody EncryptionRequest request,
             Authentication authentication) throws Exception {
-
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         Long userId = userDetails.getUserId();
         log.debug("User Id is: {}", userId);
-
         String encryptedMessage = encryptionService.encrypt(request.getMessage(), request.getEncryptionType());
         return new ResponseEntity<>(new EncryptionResponse(encryptedMessage), HttpStatus.OK);
     }
@@ -42,14 +40,11 @@ public class EncryptionController {
     @PostMapping("/decrypt")
     @PreAuthorize("hasRole('MESSAGE_READER')")
     public ResponseEntity<DecryptionResponse> decryptMessage(
-            @Valid @RequestBody DecryptionRequest request,
-            Authentication authentication) throws Exception {
-
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        Long userId = userDetails.getUserId();
-        log.debug("User Id: {}", userId);
-        String decryptedMessage = encryptionService.decrypt(request.getEncryptedMessage(), request.getEncryptionType());
-        return new ResponseEntity<>(new DecryptionResponse(decryptedMessage), HttpStatus.OK);
+            @Valid @RequestBody DecryptionRequest request) throws Exception {
+        String decryptedMessage = encryptionService.decrypt(
+                request.getEncryptedMessage(),
+                request.getEncryptionType()
+        );
+        return ResponseEntity.ok(new DecryptionResponse(decryptedMessage));
     }
-
 }

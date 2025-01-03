@@ -45,11 +45,7 @@ public class MessageService {
     }
 
     public Optional<Message> getMessage(Long messageId, Long userId) {
-        Optional<Message> messageOpt = messageRepository.findById(messageId);
-        if (messageOpt.isPresent() && messageOpt.get().getUserId().equals(userId)) {
-            return messageOpt;
-        }
-        return Optional.empty();
+        return messageRepository.findByIdAndUserId(messageId,userId);
     }
 
     private Long getUserIdFromAuthentication(Authentication authentication) throws Exception {
