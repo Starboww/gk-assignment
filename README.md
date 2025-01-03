@@ -447,7 +447,7 @@ The **Encryption Service** is responsible for encrypting and decrypting messages
 JWT (JSON Web Token) is used for securing API endpoints across all services. Each token includes the following claims:
 
 - **Subject (`sub`):** Username of the authenticated user.
-- **Roles (`roles`):** Comma-separated list of roles assigned to the user (e.g., `ROLE_message_writer,ROLE_message_reader`).
+- **Roles (`roles`):** Comma-separated list of roles assigned to the user (e.g., `MESSAGE_WRITER, MESSAGE_READER`).
 - **User ID (`userId`):** Unique identifier of the user.
 - **Issued At (`iat`):** Timestamp when the token was issued.
 - **Expiration (`exp`):** Token expiration timestamp.
@@ -548,25 +548,3 @@ public interface EncryptionClient {
     DecryptionResponse decryptMessage(@RequestBody DecryptionRequest request);
 }
 ```
-
-**Feign Client Configuration:**
-
-```java
-@Configuration
-public class FeignClientConfig {
-    @Bean
-    public RequestInterceptor requestInterceptor() {
-        return new RequestInterceptor() {
-            @Override
-            public void apply(RequestTemplate template) {
-                Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-                if (authentication != null && authentication.getCredentials() != null) {
-                    String token = authentication.getCredentials().toString();
-                    template.header("Authorization", "Bearer " + token);
-                }
-            }
-        };
-    }
-}
-```
-
