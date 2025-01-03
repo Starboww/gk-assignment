@@ -472,8 +472,8 @@ JWT (JSON Web Token) is used for securing API endpoints across all services. Eac
 
 Roles define the permissions a user has within the system:
 
-- **`ROLE_message_writer`:** Allows the user to send (write) messages.
-- **`ROLE_message_reader`:** Allows the user to retrieve (read) messages.
+- **`MESSAGE_WRITER`:** Allows the user to send (write) messages.
+- **`MESSAGE_READER`:** Allows the user to retrieve (read) messages.
 
 **Role Assignment Rules:**
 
