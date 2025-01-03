@@ -33,7 +33,7 @@ public class EncryptionController {
 
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         Long userId = userDetails.getUserId();
-        log.debug("User Id: {}", userId);
+        log.debug("User Id is: {}", userId);
 
         String encryptedMessage = encryptionService.encrypt(request.getMessage(), request.getEncryptionType());
         return new ResponseEntity<>(new EncryptionResponse(encryptedMessage), HttpStatus.OK);
@@ -45,7 +45,6 @@ public class EncryptionController {
             @Valid @RequestBody DecryptionRequest request,
             Authentication authentication) throws Exception {
 
-        // Extract userId from Authentication
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         Long userId = userDetails.getUserId();
         log.debug("User Id: {}", userId);

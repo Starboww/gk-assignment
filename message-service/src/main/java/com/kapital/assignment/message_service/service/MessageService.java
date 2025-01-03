@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
@@ -37,7 +38,7 @@ public class MessageService {
                 .originalMessage(messageContent)
                 .encryptionType(encryptionType.toUpperCase())
                 .userId(userId)
-                .createdAt(ZonedDateTime.from(Instant.now()))
+                .createdAt(ZonedDateTime.ofInstant(Instant.now(), ZoneId.systemDefault()))
                 .build();
 
         return messageRepository.save(message);
