@@ -7,7 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class AuthenticationServiceApplication {
 
     public static void main(String[] args) {
-        //TODO : Remove this @Suraj
 //		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 //		String rawPassword = "password123";
 //		String hashedPassword = encoder.encode(rawPassword);

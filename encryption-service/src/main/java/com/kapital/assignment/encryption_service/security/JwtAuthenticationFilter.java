@@ -43,11 +43,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 List<SimpleGrantedAuthority> authorities = tokenProvider.getRolesFromJWT(jwt).stream()
                         .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
                         .collect(Collectors.toList());
-//                logger.info("Parsed Username: {}", username);
-//                logger.debug("Parsed Roles: {}", authorities);
-//                logger.debug("Parsed UserId: {}", userId);
 
-                // Create CustomUserDetails with userId
                 CustomUserDetails userDetails = new CustomUserDetails(username, userId, authorities);
 
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
@@ -86,5 +82,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return null;
     }
 
-    // Remove or refactor the checkAccess method if not needed
 }

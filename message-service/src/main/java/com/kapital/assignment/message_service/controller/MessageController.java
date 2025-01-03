@@ -55,15 +55,20 @@ public class MessageController {
             // Extract userId from CustomUserDetails
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             Long userId = userDetails.getUserId();
-
             return messageService.getMessage(id, userId)
                     .map(message -> ResponseEntity
-                            .ok(new GetMessageResponse(message.getId(), message.getEncryptedMessage(), "")))
+                            .ok(GetMessageResponse.builder()
+                                    .messageId(message.getId())
+                                    .encryptedMessage(message.getEncryptedMessage())
+                                    .build()))
+
                     .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
-                            .body(new GetMessageResponse(null, null, "Message not found")));
+                            .body(GetMessageResponse.builder()
+                                    .error("Message not found")
+                                    .build()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new GetMessageResponse(null, null, e.getMessage()));
+                    .body(GetMessageResponse.builder().error(e.getMessage()).build());
         }
     }
 

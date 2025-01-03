@@ -7,6 +7,7 @@ import com.kapital.assignment.encryption_service.dto.EncryptionRequest;
 import com.kapital.assignment.encryption_service.dto.EncryptionResponse;
 import com.kapital.assignment.encryption_service.service.EncryptionService;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/encrypt")
 public class EncryptionController {
@@ -24,42 +26,30 @@ public class EncryptionController {
     private EncryptionService encryptionService;
 
     @PostMapping
-    // @PreAuthorize("hasRole('message_writer')")
+    @PreAuthorize("hasRole('MESSAGE_WRITER')")
     public ResponseEntity<EncryptionResponse> encryptMessage(
             @Valid @RequestBody EncryptionRequest request,
             Authentication authentication) throws Exception {
 
-        // Extract userId from Authentication
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         Long userId = userDetails.getUserId();
-
-        // Optionally, use userId for logging or auditing
-        // For example:
-        // logger.info("User ID {} is encrypting a message.", userId);
+        log.debug("User Id is: {}", userId);
 
         String encryptedMessage = encryptionService.encrypt(request.getMessage(), request.getEncryptionType());
         return new ResponseEntity<>(new EncryptionResponse(encryptedMessage), HttpStatus.OK);
     }
 
     @PostMapping("/decrypt")
-    @PreAuthorize("hasRole('message_reader')")
+    @PreAuthorize("hasRole('MESSAGE_READER')")
     public ResponseEntity<DecryptionResponse> decryptMessage(
             @Valid @RequestBody DecryptionRequest request,
             Authentication authentication) throws Exception {
 
-        // Extract userId from Authentication
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         Long userId = userDetails.getUserId();
-
-        // Optionally, use userId for logging or auditing
-        // For example:
-        // logger.info("User ID {} is decrypting a message.", userId);
-
+        log.debug("User Id: {}", userId);
         String decryptedMessage = encryptionService.decrypt(request.getEncryptedMessage(), request.getEncryptionType());
         return new ResponseEntity<>(new DecryptionResponse(decryptedMessage), HttpStatus.OK);
     }
-
-    // DTO Classes
-
 
 }

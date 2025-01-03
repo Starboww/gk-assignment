@@ -74,7 +74,7 @@ public class JwtUtils {
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("roles", String.join(",", roles));
-        claims.put("userId", user.getId()); // Embed userId in the token
+        claims.put("userId", user.getId());
 
         return Jwts.builder()
                 .setSubject(user.getUsername())
