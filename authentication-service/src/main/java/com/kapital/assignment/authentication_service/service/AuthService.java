@@ -16,12 +16,22 @@ import org.springframework.stereotype.Service;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Service responsible for handling authentication and registration of users.
+ */
 @Service
 public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
     private final JwtUtils jwtUtils;
 
+    /**
+     * Constructs an AuthService with the required dependencies.
+     *
+     * @param authenticationManager the manager used to authenticate users
+     * @param userService           the service for user-related operations
+     * @param jwtUtils              utility for generating JWT tokens
+     */
     @Autowired
     public AuthService(AuthenticationManager authenticationManager,
                        UserService userService,
@@ -31,6 +41,12 @@ public class AuthService {
         this.jwtUtils = jwtUtils;
     }
 
+    /**
+     * Authenticates a user based on the provided authentication request.
+     *
+     * @param authRequest the authentication request containing username and password
+     * @return an AuthResponse containing the generated JWT token
+     */
     public AuthResponse authenticateUser(AuthRequest authRequest) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -46,6 +62,13 @@ public class AuthService {
         return new AuthResponse(token);
     }
 
+    /**
+     * Registers a new user with the provided registration details.
+     *
+     * @param registrationRequest the registration request containing user details
+     * @return a RegistrationResponse containing the JWT token and a success message
+     * @throws ConflictException if the username is already in use
+     */
     public RegistrationResponse registerUser(RegistrationRequest registrationRequest) throws ConflictException {
         if (userService.existsByUsername(registrationRequest.getUsername())) {
             throw new ConflictException("Username is already in use");
@@ -73,5 +96,4 @@ public class AuthService {
                 .message("User registered successfully")
                 .build();
     }
-
 }
